@@ -1,11 +1,11 @@
 # Google-s-Data-Analytics-Case-Study
 ## Overview
 
-This repository contains an in-depth analysis for Cyclistic, a fictional bike-sharing company based in Chicago. As part of Google's Data Analytics Professional Certificate capstone project, this study aims to provide insights and recommendations on converting casual riders into annual members.
+This repository contains an in-depth analysis of Cyclistic, a fictional bike-sharing company based in Chicago. As part of Google's Data Analytics Professional Certificate capstone project, this study aims to provide insights and recommendations on converting casual riders into annual members.
 
 ## Background
 
-The executive team at Cyclistic is exploring ways to expand their business and they believe that implementing a focused marketing plan can help convert occasional riders into loyal, long-term members. Their objective is to analyze the riding behaviors and preferences of these two user groups and develop a data-driven strategy accordingly.
+The executive team at Cyclistic is exploring ways to expand their business. A focused marketing plan can help convert occasional riders into loyal, long-term members. Their objective is to analyze these two user groups' riding behaviors and preferences and develop a data-driven strategy accordingly.
 
 ## Contents
 
@@ -14,13 +14,13 @@ The executive team at Cyclistic is exploring ways to expand their business and t
 
 ## Objective
 
-To present a comprehensive data analysis report, highlighting key patterns and providing actionable recommendations that can guide Cyclistic's marketing strategy.
+To present a comprehensive data analysis report, highlight key patterns, and provide actionable recommendations to guide Cyclistic's marketing strategy.
 
 ## About the Author
 
-To learn more about other projects I have, you can visit my website [Irmin Coronas G](https://irmincoronasg.com/).
+To learn more about other projects I have, you can visit my website [Irmin Corona](https://irmincoronasg.com/).
 
 
 ## Note
 
-This is a fictional case study and is part of a capstone project for Google's Data Analytics Professional Certificate.
+This fictional case study is part of a capstone project for Google's Data Analytics Professional Certificate.
