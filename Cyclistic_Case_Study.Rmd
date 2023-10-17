@@ -1,0 +1,477 @@
+---
+title: "Cyclistic_Case_Study_Using_R"
+author: "Irmin Corona"
+date: "2023-10-10"
+output: 
+  html_document: 
+    theme: cerulean
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## A Capstone Project for the Google Data Analystics Professional Certificate
+
+## Discover Chicago on Two Wheels with Cyclistic! 🚲
+
+Ever wonder how Chicagoans and visitors zip around the city? At Cyclistic, we were curious too! That's why we delved into a year-long exploration, diving deep into our ride data. Our mission? To understand the unique ways our riders experience the Windy City.
+
+Guess what we found? Fascinating trends and patterns that are now steering our next big moves. Armed with these insights, we're fine-tuning our services and gearing up our marketing game to give you an even smoother ride around Chicago. Because for us, it's not just about getting from point A to B; it's about enhancing your journey every pedal of the way.
+
+Ready to be a part of Cyclistic's exciting future in urban transportation? Hop on, and let's ride the end together!
+
+## Marketing Analytics Team's Objectives 🎯
+
+The Marketing Analytics team has established a clear directive:
+ 
+- **Goal**: Design and implement marketing strategies with a focus on converting casual riders into annual members.
+
+To realize this ambition, the team recognizes the need for a deeper understanding of several facets:
+
+- Distinctions between annual members and casual riders.
+- Incentives that might persuade casual riders to opt for a membership.
+- The influence of digital media on their marketing strategies.
+
+In addition to the above, there's a marked interest from the Marketing Analytics team in dissecting Cyclistic's historical bike trip data to pinpoint pivotal trends.
+
+
+## My Hypothesis 💡
+
+While the primary focus remains on converting casual riders into annual members, considering the significant presence of casual riders, I suggest a dual-strategy approach. Not only should we direct efforts towards conversion, but we must also amplify our engagement strategies targeting the casual rider segment. By resonating with the preferences and requirements of this substantial segment, we may uncover greater opportunities and ensure elevated user satisfaction across the board.
+
+## Sneak Peek 🔍
+
+My analysis indicates that Cyclistic's annual members are mainly workday commuters who prefer shorter rides. At the same time, casual riders opt for relaxed weekend explorations. As summer is the prime biking season, I recommend implementing strategies tailored to these insights, such as offering a limited Spring 2024 Pass, exclusive digital perks, and targeted SEO campaigns. By leveraging these insights, Cyclistic can convert casual riders into committed members. Check out the report for a more detailed analysis.
+
+###### To learn more about other projects I have, you can visit my website ➡️ [click here](https://irmincoronasg.com/)
+
+### Stakeholders
+
+* Director of Marketing
+* Marketing Analytics team
+* Cyclistic users
+
+
+### Setting up my environment
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+library(janitor)
+library(dplyr)
+library(hms)
+```
+
+## Data Preparation 💻
+
+I've sourced 12 months of trip data for Cyclistic from July 2022 to June 2023. Each month's dataset resides in its own `.csv` file. This first-party data, which is directly gathered and utilized by Cyclistic, is the backbone of my analysis. For this capstone, the data is licensed from "divvybikes.com," an established bike-sharing service in Chicago. It's worth noting that all riders' personal information has been thoroughly anonymized for privacy reasons.
+
+#### Loading .csv files
+```{r}
+jun23_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202306-divvy-tripdata.csv")
+may23_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202305-divvy-tripdata.csv")
+apr23_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202304-divvy-tripdata.csv")
+mar23_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202303-divvy-tripdata.csv")
+feb23_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202302-divvy-tripdata.csv")
+jan23_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202301-divvy-tripdata.csv")
+dec22_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202212-divvy-tripdata.csv")
+nov22_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202211-divvy-tripdata.csv")
+oct22_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202210-divvy-tripdata.csv")
+sep22_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202209-divvy-publictripdata.csv")
+aug22_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202208-divvy-tripdata.csv")
+jul22_df <- read_csv("C:/Users/irmin/OneDrive/Desktop/Case_Study_R/202207-divvy-tripdata.csv")
+```
+
+###### For sep22_df, the file name deviates from the usual pattern.
+###### However, after inspecting the dataset, the columns are consistent with other monthly datasets.
+
+## Data Credibility: The ROCCC Approach
+
+- **Reliable**: The dataset is both complete and accurate, encapsulating every bike ride in Chicago during our analysis period.
+
+- **Original**: The data has been sourced from the Google Data Analytics Capstone: Complete a Case Study.
+
+- **Comprehensive**: It provides a holistic view of each ride, detailing the start/end times, station names and IDs, membership types, and more.
+
+- **Current**: The dataset is recent, covering up to the end of June 2023.
+
+- **Cited**: We've adhered to data licensing terms, sourcing our information under the appropriate Data License Agreement.
+
+## Cleaning
+
+### Checking Dataset Column Consistency
+
+In this section, I will verify if all the datasets have the same column structure. This ensures that they're consistent and compatible for my further analysis.
+
+
+```{r}
+all_same_columns <- all(
+  identical(colnames(jun23_df), colnames(may23_df)),
+  identical(colnames(jun23_df), colnames(apr23_df)),
+  identical(colnames(jun23_df), colnames(mar23_df)),
+  identical(colnames(jun23_df), colnames(feb23_df)),
+  identical(colnames(jun23_df), colnames(jan23_df)),
+  identical(colnames(jun23_df), colnames(dec22_df)),
+  identical(colnames(jun23_df), colnames(nov22_df)),
+  identical(colnames(jun23_df), colnames(oct22_df)),
+  identical(colnames(jun23_df), colnames(sep22_df)),
+  identical(colnames(jun23_df), colnames(aug22_df)),
+  identical(colnames(jun23_df), colnames(jul22_df))
+)
+
+if (all_same_columns) {
+  cat("All datasets have the same columns.\n")
+} else {
+  cat("Not all datasets have the same columns.\n")
+}
+```
+##### All datasets have the same columns.
+
+
+## Let's Dive Deep Into Cyclistic's Data 🚴
+
+### Step 1: First thing's first!  Merging all our monthly data sets - from July 2022 to June 2023 - into a single dataframe.
+
+```{r}
+cyclistic_df <- rbind(jun23_df, may23_df, apr23_df, mar23_df, feb23_df, jan23_df, dec22_df, nov22_df, oct22_df, sep22_df, aug22_df, jul22_df)
+```
+
+### Step 2: Now, I'm zooming into the essential details. Let's keep our data tidy by focusing only on the columns we really need.
+
+```{r}
+trimmed_cyclistic_df <- select(cyclistic_df, rideable_type, started_at, ended_at, member_casual)
+```
+
+### Step 3: Keeping things neat! I'll clone our trimmed dataframe so that we can freely manipulate without messing the original.
+
+```{r}
+cyclistic_new_df <- trimmed_cyclistic_df
+```
+
+### Step 4: Time for some calculations! Figuring out how long each ride lasted.
+
+```{r}
+cyclistic_new_df$ride_length <- difftime(cyclistic_new_df$ended_at, cyclistic_new_df$started_at, units = "mins")
+cyclistic_new_df$ride_length <- round(cyclistic_new_df$ride_length, digits = 1)
+```
+
+### Step 5: Knowledge is power, right? Let's enrich our dataset with some juicy time details.
+
+```{r}
+cyclistic_new_df$date <- as.Date(cyclistic_new_df$started_at) 
+cyclistic_new_df$day_of_week <- format(as.Date(cyclistic_new_df$date),"%A") 
+cyclistic_new_df$month <- format(as.Date(cyclistic_new_df$date), "%m") 
+cyclistic_new_df$day <- format(as.Date(cyclistic_new_df$date), "%d") 
+cyclistic_new_df$year <- format(as.Date(cyclistic_new_df$date), "%Y") 
+cyclistic_new_df$time <- as_hms(cyclistic_new_df$started_at) 
+cyclistic_new_df$hour <- hour(cyclistic_new_df$time) 
+```
+
+### Step 6: A sneak peek! Let's see the first few rows of our enriched data.
+
+```{r}
+head(cyclistic_new_df)
+```
+
+### Step 7: The final touch! Cleaning is essential, be it our rooms or our data. Let's dust off any inconsistencies.
+
+```{r}
+cyclistic_new_df <- na.omit(cyclistic_new_df) 
+cyclistic_new_df <- distinct(cyclistic_new_df) 
+cyclistic_new_df <- cyclistic_new_df[!(cyclistic_new_df$ride_length <=0),] 
+```
+
+### There you have it! With these steps, we've paved a smooth path to dive into deeper analyses and visuals. Let's roll! 
+
+## Deep Dive: Analyzing the Ride Data
+
+### 1. General Overview
+
+```{r}
+overall_stats <- cyclistic_new_df %>% 
+  summarise(
+    total_rides = n(),
+    avg_ride_length = mean(ride_length, na.rm = TRUE),
+    busiest_time = hms::as_hms(as.numeric(names(which.max(table(hour)))) * 3600),
+    busiest_weekday = names(which.max(table(day_of_week))),
+    busiest_month = month.name[as.numeric(names(which.max(table(month))))],
+    most_popular_bike = names(which.max(table(rideable_type))),
+    most_rides = ifelse(sum(member_casual == "member") > sum(member_casual == "casual"), "Members", "Casual Riders")
+  )
+overall_stats
+```
+
+### 2. Breaking Down by Customer Type
+
+```{r}
+stats_by_type <- cyclistic_new_df %>%
+  group_by(member_casual) %>%
+  summarise(
+    total_rides = n(),
+    avg_ride_length = mean(ride_length, na.rm = TRUE),
+    busiest_time = names(which.max(table(hour))),
+    busiest_weekday = names(which.max(table(day_of_week))),
+    busiest_month = names(which.max(table(month))),
+    most_popular_bike = names(which.max(table(rideable_type)))
+  )
+stats_by_type
+```
+
+### 3. Weekday Analysis
+
+```{r}
+avg_ride_by_weekday <- cyclistic_new_df %>%
+  group_by(member_casual, day_of_week) %>%
+  summarise(average_ride_length = mean(ride_length, na.rm = TRUE), .groups = 'drop') %>%
+  spread(key = member_casual, value = average_ride_length) %>%
+  arrange(desc(casual), desc(member))
+avg_ride_by_weekday
+```
+
+### 4. Members vs. Casual Riders
+
+
+```{r}
+most_rides <- cyclistic_new_df %>%
+  count(member_casual) %>%
+  arrange(desc(n))
+most_rides
+```
+## Visualizing 🎨
+
+### Total Rides
+
+```{r}
+stats_by_type <- stats_by_type %>%
+  arrange(desc(member_casual)) %>%
+  mutate(
+    percent = total_rides / sum(total_rides) * 100,
+    label = sprintf("%s\n%.1f%%", scales::comma(total_rides), percent),
+    lab.y = cumsum(total_rides) - 0.5 * total_rides
+  )
+
+stats_by_type %>%
+  ggplot(aes(x = "", y = total_rides, fill = member_casual)) +
+  geom_bar(width = 1, stat = "identity") +
+  geom_text(aes(label = label, y = lab.y), size = 4) +
+  coord_polar(theta = "y") +
+  labs(title = "Total Rides By Customer Type", fill = "Customer Type", caption = "Data represents rides from Jan to Dec 2023.") +
+  scale_fill_manual(values = c("casual" = "#B3DDF2", "member" = "#3F81B6")) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+```
+
+### Average Ride Length
+
+```{r}
+stats_by_type %>%
+  ggplot(aes(x = member_casual, y = avg_ride_length, fill = member_casual)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(label = sprintf("%.2f mins", avg_ride_length)), vjust = -0.25, size = 4) +
+  labs(title = "Average Ride Length By Customer Type",
+       y = "Ride Length (minutes)",
+       x = "Customer Type") +
+  scale_fill_manual(values = c("casual" = "#B3DDF2", "member" = "#3F81B6")) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(face = "bold", size = 12))
+```
+
+### Weekday Analysis
+
+#### Computing the average ride length by weekday for each member_casual category
+```{r}
+avg_ride_by_weekday <- cyclistic_new_df %>%
+  group_by(member_casual, day_of_week) %>%
+  summarize(average_ride_length = mean(ride_length, na.rm = TRUE)) %>%
+  arrange(member_casual, day_of_week)
+```
+
+### Plotting the average ride length by weekday
+```{r}
+avg_ride_by_weekday %>%
+  ggplot(aes(x = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")), 
+             y = average_ride_length, fill = member_casual)) +
+  geom_col(position = "dodge", width = 0.8) +
+  labs(title = "Average Ride Length by Weekday", 
+       y = "Average Ride Length (minutes)", 
+       x = "") +
+  scale_fill_manual(values = c("casual" = "#B3DDF2", "member" = "#3F81B6")) +
+  theme_light() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5),
+        legend.title = element_blank())
+```
+
+### Understanding Customer Behavior by Analyzing Bike Usage by Hour
+#### Function to compute stats by hour
+```{r}
+stats_by_time_function <- function(df) {
+  df %>%
+    group_by(hour, member_casual) %>%
+    summarize(number_of_trips = n()) %>%
+    arrange(hour, member_casual)
+}
+
+stats_by_time <- stats_by_time_function(cyclistic_new_df)
+```
+### Plotting the results
+```{r}
+stats_by_time %>%
+  ggplot(aes(x = hour, y = number_of_trips, fill = member_casual)) +
+  geom_col(position = "dodge", width = 0.7) +
+  labs(title = "Bike Demand by Hour", 
+       y = "Number of Rides", 
+       x = "Hour of Day") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = c("casual" = "#B3DDF2", "member" = "#3F81B6")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5),
+        legend.title = element_blank())
+```
+
+### Understanding Customer Behavior by Analyzing Bike Usage by Day of the Week
+##### Function to compute stats by weekday
+```{r}
+stats_by_weekday_function <- function(df) {
+  df %>%
+    group_by(day_of_week, member_casual) %>%
+    summarize(number_of_rides = n(), .groups = "drop") %>%
+    mutate(day_of_week = factor(day_of_week, levels = c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))) %>%
+    arrange(day_of_week)
+}
+```
+### Function to plot stats by weekday
+```{r}
+plot_by_weekday <- function(data) {
+  data %>%
+    ggplot(aes(x = day_of_week, y = number_of_rides, fill = member_casual)) +
+    geom_col(position = "dodge", width = 0.7) +
+    labs(title = "Bike Rides by Day of the Week", 
+         y = "Number of Rides", 
+         x = "Day of the Week") +
+    scale_y_continuous(labels = scales::comma) +
+    scale_fill_manual(values = c("casual" = "#B3DDF2", "member" = "#3F81B6")) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          plot.title = element_text(hjust = 0.5),
+          legend.title = element_blank())
+}
+```
+### Compute stats and plot
+```{r}
+weekday_data <- stats_by_weekday_function(cyclistic_new_df)
+plot_by_weekday(weekday_data)
+```
+
+### Understanding Customer Behavior by Analyzing Bike Usage by Month of the Year
+#### Function to compute stats by month
+```{r}
+stats_by_month_function <- function(df) {
+  df %>%
+    group_by(month, member_casual) %>%
+    summarize(number_of_rides = n(), .groups = "drop") %>%
+    arrange(match(month, month.name), member_casual)
+}
+```
+### Compute stats
+```{r}
+stats_by_month_data <- stats_by_month_function(cyclistic_new_df)
+```
+### Plotting the results
+```{r}
+stats_by_month_data %>%
+  ggplot(aes(x = month, y = number_of_rides, fill = member_casual)) +
+  geom_col(position = "dodge", width = 0.7) +
+  labs(title = "Bike Rides by Month of the Year", 
+       y = "Number of Rides", 
+       x = "Month") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = c("casual" = "#B3DDF2", "member" = "#3F81B6")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(hjust = 0.5),
+        legend.title = element_blank())
+```
+
+## Key Findings for Cyclistic Bike Share Usage 🔑
+
+### My analysis of Cyclistic's bike share data has revealed interesting usage patterns:
+
+- **Ride Frequency**: The bulk of the rides are dominated by members, contributing to 61.2% of the total. In comparison, casual riders are responsible for 38.8% of the rides. This skew underscores the loyalty and habitual usage patterns of members.
+
+- **Ride Duration Disparity**: Casual riders are not in a hurry, it seems! Their rides average 27.77 minutes, a leisurely pace in contrast to the brisk 12.41 minutes that members spend on average for their trips. The shorter rides of members may hint at utilitarian trips, while casual users indulge in longer, exploratory rides.
+
+- **Peak Usage Times**: A synchrony is observed in the usage patterns of both member and casual riders around 17:00 (5 pm). This popular window may coincide with the end of a workday, an opportune moment for a ride.
+
+- **Weekday Analysis**: The weekdays are bustling for members, suggesting a potential alignment with work-related commutes. On the flip side, casual riders are most active during the weekends, painting a picture of recreational usage.
+
+- **Monthly Trends**: Summer is the reigning champion for both categories of riders. June, July, and August see the highest usage. A noteworthy mention is the continued preference of members for biking even into September, possibly stretching their work-related commutes a bit more before winter sets in.
+
+
+## Differences in Usage Between Annual Members and Casual Riders
+
+### Frequency & Duration
+- **Members**: Represent 61.2% of total rides with brisk, purpose-driven rides averaging 12.41 minutes.
+- **Casual Riders**: Constitute 38.8% of rides, indulging in more leisurely rides, averaging 27.77 minutes.
+
+### Peak Times & Weekday Patterns
+- **Shared Peak Time**: Both groups converge in usage around 17:00 (5 pm).
+- **Usage Pattern**: Members lean towards weekdays, likely for commuting. Casual riders are active on weekends, suggesting recreational intent.
+
+### Seasonal Trends
+- **Summer Surge**: Summer sees a ride surge for both categories. Members, however, persist with high usage into September.
+
+## Recommendations for Encouraging Casual Riders to Purchase Annual Memberships
+
+### Cost Efficiency for Regular Riders
+- **Spring 2024 Pass**: A limited three-month discounted pass for spring can attract casual riders by demonstrating value over single-use fares.
+
+### Weekend Incentives
+- **Weekend Wanderer Pass**: Casual riders often use the service during weekends, averaging 27.7 minutes per ride. A specialized weekend pass can extend their rides without time concerns, increasing brand affinity.
+
+### Exclusive Benefits & Perks
+- **Member-Only Rewards**: By introducing exclusive perks like special bikes, discounts, or early access events for members, Cyclistic can create a compelling case for casual riders to commit to longer-term memberships.
+
+
+## How can Cyclistic use digital media to influence casual riders to become members?
+
+### Targeted Advertising
+
+Amplify brand awareness with **targeted campaigns at high-frequency stations during peak hours (5 p.m.) and summer months**.
+
+### Engaging Content
+
+- **Weekend Wonders**: Collaborate with renowned influencers to spotlight Chicago's prime locations best explored by bike.
+
+- **Healthy Commutes**: Promote the health benefits of daily bike commuting.
+
+- **Transformational Tales**: Share impactful stories of individuals whose lives transformed positively through regular cycling.
+
+### Exclusive Digital Offers
+
+Unveil time-limited membership deals targeting casual riders on emails, social media, and partner apps.
+
+### Seasonal Campaigns
+
+Capitalize on summer's allure with offers such as **"Summer Special 2024" or September's "Ride into Autumn 2024"** to captivate casual riders.
+
+### Interactive Tools
+
+Launch a "Savings Calculator" online, empowering casual riders to visualize potential savings with memberships.
+
+### SEO Strategy
+
+- **Search Intent**: Boost organic reach with an SEO campaign focusing on queries about **cycling in Chicago**.
+
+- **Engaging Queries**: Address questions like **"Best bike spots in Chicago"** or **"Chicago bike rental costs"** to build a memorable brand presence.
