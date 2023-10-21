@@ -12,7 +12,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-## A Capstone Project for the Google Data Analystics Professional Certificate
+## A Capstone Project for the Google Data Analytics Professional Certificate
 
 ## Discover Chicago on Two Wheels with Cyclistic! 🚲
 
