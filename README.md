@@ -2,6 +2,7 @@
 ## Overview
 
 This repository contains an in-depth analysis of Cyclistic, a fictional bike-sharing company based in Chicago. As part of Google's Data Analytics Professional Certificate capstone project, this study aims to provide insights and recommendations on converting casual riders into annual members.
+To check the Case Study click here ➡️ https://ircorona.github.io/Google-s-Data-Analytics-Case-Study-Using-R/
 
 ## Background
 
